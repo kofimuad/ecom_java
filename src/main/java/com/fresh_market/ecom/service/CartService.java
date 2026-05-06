@@ -112,6 +112,7 @@ public class CartService implements ICartService {
         } catch (EmptyResultDataAccessException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Product Not Found: " + productId);
         }
+
         // Check if the product is already in the cart
         String checkSql = "SELECT * FROM cart_items WHERE cart_id = ? AND product_id = ?";
         List<CartItem> existing = jdbcTemplate.query(checkSql, new CartItemRowMapper(), cartId, productId);
@@ -124,6 +125,7 @@ public class CartService implements ICartService {
             item.setQuantity(newQuantity);
             return item;
         }
+
         // new item -> if it doesn't exist.
         CartItem ci = new CartItem();
         ci.setId(UUID.randomUUID());

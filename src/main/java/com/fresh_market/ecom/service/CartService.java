@@ -101,7 +101,6 @@ public class CartService implements ICartService {
         if (quantity <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Quantity must be greater than 0");
         }
-
         // get the current price from the product table
         BigDecimal unitPrice;
         try {
@@ -113,7 +112,6 @@ public class CartService implements ICartService {
         } catch (EmptyResultDataAccessException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Product Not Found: " + productId);
         }
-
         // Check if the product is already in the cart
         String checkSql = "SELECT * FROM cart_items WHERE cart_id = ? AND product_id = ?";
         List<CartItem> existing = jdbcTemplate.query(checkSql, new CartItemRowMapper(), cartId, productId);

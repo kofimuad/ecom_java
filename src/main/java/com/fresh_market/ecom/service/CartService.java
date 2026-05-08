@@ -19,7 +19,7 @@ import java.util.UUID;
 @Service
 public class CartService implements ICartService {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public CartService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -31,7 +31,7 @@ public class CartService implements ICartService {
         public Cart mapRow(ResultSet rs, int rowNum) throws SQLException {
             Cart c = new Cart();
             c.setId((UUID) rs.getObject("id"));
-            c.setUserId((UUID) rs.getObject("userId"));
+            c.setUserId((UUID) rs.getObject("user_id"));
             c.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
             return c;
         }
@@ -62,7 +62,7 @@ public class CartService implements ICartService {
             cart.setUserId(userId);
             cart.setCreatedAt(LocalDateTime.now());
 
-            String insertSql = "INSERT INTO carts (cart_id, user_id, created_at) VALUES (?, ?, ?)";
+            String insertSql = "INSERT INTO carts (id, user_id, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(insertSql, cart.getId(), cart.getUserId(), cart.getCreatedAt());
             return cart;
         }
@@ -136,7 +136,7 @@ public class CartService implements ICartService {
         ci.setCreatedAt(LocalDateTime.now());
 
         String insertSql = """
-                INSERT INTO cart_items (id, cart_id, product_id, quantity, price, created_at) VALUES (?, ?, ?, ?, ?, ?);
+                INSERT INTO cart_items (id, cart_id, product_id, quantity, unit_price, created_at) VALUES (?, ?, ?, ?, ?, ?);
                 """;
         jdbcTemplate.update(
                 insertSql,
@@ -157,7 +157,7 @@ public class CartService implements ICartService {
             return null;
         }
         String updateSql = "UPDATE cart_items SET quantity = ? WHERE id = ?";
-        CartItem existing = new CartItem();
+        CartItem existing = getCartItemById(cartItemId);
         jdbcTemplate.update(updateSql, quantity, cartItemId);
         existing.setQuantity(quantity);
         return existing;

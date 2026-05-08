@@ -66,9 +66,9 @@ public class ProductImageService implements IProductImage {
         jdbcTemplate.update(sql, id);
     }
 
-    @Override
-    public void deleteImagesByProductId(UUID productId) {
-        String sql = "DELETE FROM product_images WHERE product_id = ?";
-        jdbcTemplate.update(sql, productId);
-    }
+//    @Override
+//    public void deleteImagesByProductId(UUID productId) {
+//        String sql = "DELETE FROM product_images WHERE product_id = ?";
+//        jdbcTemplate.update(sql, productId);
+//    }
 }

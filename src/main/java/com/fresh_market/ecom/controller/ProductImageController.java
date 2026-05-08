@@ -3,7 +3,6 @@ package com.fresh_market.ecom.controller;
 import com.fresh_market.ecom.model.ProductImage;
 import com.fresh_market.ecom.service.IProductImage;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

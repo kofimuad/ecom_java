@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -101,17 +102,19 @@ public class CartService implements ICartService {
         if (quantity <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Quantity must be greater than 0");
         }
-        // get the current price from the product table
-        BigDecimal unitPrice;
+
+        String productSql = "SELECT price, stock_quantity FROM products WHERE id = ?";
+        Map<String, Object> productData;
         try {
-            unitPrice = jdbcTemplate.queryForObject(
-                    "SELECT price FROM products WHERE id = ?",
-                    BigDecimal.class,
-                    productId
+            productData = jdbcTemplate.queryForMap(
+                    productSql, productId
             );
         } catch (EmptyResultDataAccessException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Product Not Found: " + productId);
         }
+
+        BigDecimal unitPrice = (BigDecimal) productData.get("price");
+        int stockQuantity = (Integer) productData.get("stock_quantity");
 
         // Check if the product is already in the cart
         String checkSql = "SELECT * FROM cart_items WHERE cart_id = ? AND product_id = ?";
@@ -120,10 +123,22 @@ public class CartService implements ICartService {
         if (!existing.isEmpty()) { // if it already exists
             CartItem item = existing.get(0);
             int  newQuantity = item.getQuantity() + quantity;
+
+            // Stock check for existing item before incrementing
+            if (newQuantity > stockQuantity) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Not enough stock. Requested: " + newQuantity + ", Available: " + stockQuantity);
+            }
+
             String updateSql = "UPDATE cart_items SET quantity = ? WHERE id = ?";
             jdbcTemplate.update(updateSql, newQuantity, item.getId());
             item.setQuantity(newQuantity);
             return item;
+        }
+
+        // Stock check for new item before adding to cart.
+
+        if (quantity > stockQuantity) {
+            throw new  ResponseStatusException(HttpStatus.BAD_REQUEST,"Not enough stock. Requested: " + quantity + ", Available: " + stockQuantity);
         }
 
         // new item -> if it doesn't exist.
@@ -156,8 +171,19 @@ public class CartService implements ICartService {
             removeItem(cartItemId);
             return null;
         }
-        String updateSql = "UPDATE cart_items SET quantity = ? WHERE id = ?";
+
         CartItem existing = getCartItemById(cartItemId);
+        // Stock check before updating quantity
+
+        String stockSql = "SELECT stock_quantity FROM products WHERE id = ?";
+        Integer stockQuantity = jdbcTemplate.queryForObject(stockSql, Integer.class, existing.getProductId());
+        if (stockQuantity == null || quantity > stockQuantity) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Not enough stock. Requested: " + quantity + ", Available: " + stockQuantity
+            );
+        }
+        String updateSql = "UPDATE cart_items SET quantity = ? WHERE id = ?";
         jdbcTemplate.update(updateSql, quantity, cartItemId);
         existing.setQuantity(quantity);
         return existing;

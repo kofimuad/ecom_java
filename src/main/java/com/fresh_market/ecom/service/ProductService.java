@@ -29,6 +29,8 @@ public class ProductService implements IProductService {
         product.setSku(rs.getString("sku"));
         product.setCategoryId((UUID) rs.getObject("category_id"));
         product.setActive(rs.getBoolean("is_active"));
+        product.setStockQuantity(rs.getInt("stock_quantity"));
+        product.setProductType(rs.getString("product_type"));
         Timestamp created = rs.getTimestamp("created_at");
         Timestamp updated = rs.getTimestamp("updated_at");
         if  (created != null) {
@@ -61,8 +63,8 @@ public class ProductService implements IProductService {
 
         String sql = """
                 INSERT into products
-                (id, name, description, price, sku, category_id, is_active, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (id, name, description, price, stock_quantity, product_type, sku, category_id, is_active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         jdbcTemplate.update(
                 sql,
@@ -70,6 +72,8 @@ public class ProductService implements IProductService {
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
+                product.getStockQuantity(),
+                product.getProductType(),
                 product.getSku(),
                 product.getCategoryId(),
                 product.isActive(),
@@ -85,7 +89,7 @@ public class ProductService implements IProductService {
 
         String sql = """
                 UPDATE products
-                SET name = ?, description  = ?, price = ?, sku = ?, category_id = ?::uuid, is_active = ?, updated_at = ?
+                SET name = ?, description  = ?, price = ?, stock_quantity = ?, product_type = ?, sku = ?, category_id = ?::uuid, is_active = ?, updated_at = ?
                 WHERE id = ?::uuid
                 """;
         jdbcTemplate.update(
@@ -93,6 +97,8 @@ public class ProductService implements IProductService {
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
+                product.getStockQuantity(),
+                product.getProductType(),
                 product.getSku(),
                 product.getCategoryId(),
                 product.isActive(),

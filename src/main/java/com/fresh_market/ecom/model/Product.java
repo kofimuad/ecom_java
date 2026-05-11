@@ -9,11 +9,29 @@ public class Product {
     private String name;
     private String description;
     private BigDecimal price;
+    private int stockQuantity;
+    private String productType;
     private String sku;
     private UUID categoryId;
     private boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
 
     public UUID getId() {
         return id;

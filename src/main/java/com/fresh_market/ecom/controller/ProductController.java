@@ -1,6 +1,7 @@
 package com.fresh_market.ecom.controller;
 
 import com.fresh_market.ecom.model.Product;
+import com.fresh_market.ecom.service.IProductService;
 import com.fresh_market.ecom.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/public/products")
 public class ProductController {
-    private final ProductService productService;
+    private final IProductService productService;
 
     public ProductController(ProductService productService) {
         this.productService = productService;

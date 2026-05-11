@@ -64,7 +64,7 @@ public class CategoryService implements ICategoryService {
         String sql = """
                 UPDATE categories
                 SET name = ?,  description = ?, parent_id = ?::uuid, updated_at = NOW()
-                WHERE category_id = ?::uuid
+                WHERE id = ?::uuid
                 RETURNING *
                 """;
         return jdbcTemplate.queryForObject(

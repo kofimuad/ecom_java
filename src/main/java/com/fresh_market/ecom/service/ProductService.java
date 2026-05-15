@@ -64,7 +64,7 @@ public class ProductService implements IProductService {
         String sql = """
                 INSERT into products
                 (id, name, description, price, stock_quantity, product_type, sku, category_id, is_active, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?::product_type, ?, ?, ?, ?, ?)
                 """;
         jdbcTemplate.update(
                 sql,

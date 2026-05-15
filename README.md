@@ -35,34 +35,39 @@ GRANT ALL PRIVILEGES ON DATABASE ecom_db TO your_db_user;
 
 ## Configuration
 
-Update `src/main/resources/application.properties` with your database credentials:
+The app reads database credentials from environment variables. Create a `.env` file at the project root with the following content:
 
-```properties
-spring.application.name=ecom
-
-spring.datasource.url=jdbc:postgresql://localhost:5432/ecom_db
-spring.datasource.username=your_db_user
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-server.error.include-message=always
+```env
+DB_URL=jdbc:postgresql://localhost:5432/ecom_db
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_password
 ```
+
+The `application.properties` file references these variables using `${DB_URL}`, `${DB_USERNAME}`, and `${DB_PASSWORD}`. Never commit your `.env` file — it is already listed in `.gitignore`.
 
 ---
 
 ## Running the Application
 
-Clone the repository and run the following command from the project root:
+Since Spring Boot does not automatically read `.env` files, you need to load the environment variables into your shell before starting the app.
+
+**Option 1 — Terminal (recommended):**
 
 ```bash
-./mvnw spring-boot:run
+export $(cat .env | xargs) && mvn spring-boot:run
 ```
 
-Or if you have Maven installed globally:
+**Option 2 — IntelliJ IDEA:**
 
-```bash
-mvn spring-boot:run
+Go to `Run > Edit Configurations`, select your Spring Boot run configuration, and add the following under `Environment variables`:
+
 ```
+DB_URL=jdbc:postgresql://localhost:5432/ecom_db
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_password
+```
+
+Then run the app normally.
 
 The server starts on `http://localhost:8080`.
 
